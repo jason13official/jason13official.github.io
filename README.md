@@ -7,6 +7,8 @@
 
 📫 How to reach me: jason13official@gmail.com
 
+Click [here](https://jason13official.github.io) to view this README file as a web-page and access more content.
+
 <!-- Starting Template from GitHub -->
 <!-- ### Hi there 👋 -->
 <!--
