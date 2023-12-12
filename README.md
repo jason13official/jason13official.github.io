@@ -2,7 +2,9 @@
 > ...a generalized software developer, with experience in Full-Stack Web Development (React/Next, Typescript, SCSS/SASS, PHP, MongoDB, SQL), Minecraft Mod Development (Java), and Machine Learning (Python).
 
 🔭 I’m currently working on several projects, and not accepting commissions until January. Feel free to message me with any questions. (/o.o)/
+
 🤔 I’m looking for help with Minecraft mods! If you can teach me, I'm willing to learn.
+
 📫 How to reach me: jason13official@gmail.com
 
 <!-- Starting Template from GitHub -->
