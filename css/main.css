@@ -1,0 +1,110 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+}
+
+header, footer {
+    background-color: #333;
+    color: white;
+    padding: 1em;
+}
+
+
+header {
+    display: flex;
+    flex-direction: column; /* stack vertically like a column */
+    justify-content: center; /* center horizontally */
+    align-items: center; /* center vertically */
+    min-height: 10vh; /* specifiy minimum height to fill */
+    max-height: 20vh;
+    text-align: center; /* center text within content */
+}
+
+footer p a {
+    color: white;
+    text-decoration: none;
+}
+
+main {
+    display: flex;
+    flex-direction: column; /* stack vertically like a column */
+    justify-content: center; /* center horizontally */
+    align-items: center; /* center vertically */
+    min-height: 50vh; /* specifiy minimum height to fill */
+    padding: 1em; /* get content away from edges */
+    text-align: center; /* center text within content */
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    background-color: #444;
+    justify-content: center;
+}
+
+nav ul a {
+    color : white;
+}
+
+nav ul a li {
+    margin: 0 1em;
+    color: white;
+    text-decoration: none;
+    padding: 0.5em 1em;
+}
+
+nav ul a li:hover {
+    background-color: #777;
+}
+
+.cf-hover-bg-color:hover {
+    background-color: #f16436;
+}
+
+.mr-hover-bg-color:hover {
+    background-color: #00af5c;
+}
+
+#menu-toggle {
+    display: none; /* hide the checkbox */
+}
+
+.content {
+    flex: 2;
+}
+
+.introduction {
+    background-color: #f0f0f0;
+}
+
+.menu-icon {
+    font-size: 2em;
+    cursor: pointer;
+    display: none; /* hide by default */
+    color: white;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+@media (max-width: 768px) {
+    
+    .menu-icon {
+        display: block;
+    }
+
+    nav ul {
+        display: none;
+        flex-direction: column;
+    }
+
+    #menu-toggle:checked + .menu-icon + nav ul {
+        display: flex;
+    }
+}
