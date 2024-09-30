@@ -63,8 +63,16 @@ nav ul a li:hover {
     background-color: #777;
 }
 
+.cf-hover-bg-color {
+    color: #f16436;
+}
+
 .cf-hover-bg-color:hover {
     background-color: #f16436;
+}
+
+.mr-hover-bg-color {
+    color: #00af5c;
 }
 
 .mr-hover-bg-color:hover {
@@ -75,14 +83,6 @@ nav ul a li:hover {
     display: none; /* hide the checkbox */
 }
 
-.content {
-    flex: 2;
-}
-
-.introduction {
-    background-color: #f0f0f0;
-}
-
 .menu-icon {
     font-size: 2em;
     cursor: pointer;
@@ -91,6 +91,23 @@ nav ul a li:hover {
     position: absolute;
     top: 20px;
     right: 20px;
+}
+
+.content {
+    flex: 2;
+}
+
+.introduction {
+    background-color: #f0f0f0;
+}
+
+.subsection {
+    padding: 0.5em;
+    display: flex;
+}
+
+.subcontainer {
+    padding: 0.5em;
 }
 
 @media (max-width: 768px) {
