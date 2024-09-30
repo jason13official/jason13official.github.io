@@ -1,0 +1,41 @@
+article, aside, dialog, figcaption, figure, footer, header, hgroup, main, nav, section {
+    display: block;
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: left;
+    background-color: #fff;
+}
+
+p, a {
+    margin-top: 0;
+    margin-bottom: 0;
+    margin-block-end: 0;
+}
+
+p > a:hover {
+    color: #f00;
+}
+
+.header-bar {
+    width:100%;
+    text-align:center;
+    color:white;
+    background-color:black;
+}
+
+.navbar {
+    position: relative;
+    left: 0;
+    height: 100vh;
+    width: 10em;
+    background-color: black;
+    color: white;
+    overflow-y: scroll;
+}
