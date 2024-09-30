@@ -84,6 +84,7 @@ nav ul a li:hover {
 
 .cf-hover-bg-color:hover {
     background-color: #f16436;
+    color: white;
 }
 
 .mr-hover-bg-color {
@@ -92,6 +93,7 @@ nav ul a li:hover {
 
 .mr-hover-bg-color:hover {
     background-color: #00af5c;
+    color: white;
 }
 
 #menu-toggle {
