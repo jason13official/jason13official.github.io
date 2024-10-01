@@ -3,7 +3,7 @@
     padding: 0;
     box-sizing: border-box;
     max-width: 100vw;
-    max-height: 100vh;
+    /* max-height: 100vh; */
 }
 
 body {
@@ -144,6 +144,15 @@ nav ul a li:hover {
     text-align: center; /* Centers the text and content inside each card */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adds subtle shadow for card effect */
     border-radius: 8px; /* Smooth corner for the cards */
+}
+
+.subcontainer img {
+    border-radius: 8px;
+}
+
+.download-count {
+    background-color: #000000;
+    color: white;;
 }
 
 @media (max-width: 768px) {
