@@ -160,70 +160,35 @@
             return num.toString(); // return if less than 1000
         }
 
-        fetch(`https://api.cfwidget.com/933354`)
-        .then(response => response.json())
-        .then(data => document.getElementById('dis-enchanting-table-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
+        const mods = [
+            { id: 933354, elementId: 'dis-enchanting-table-download-count' },
+            { id: 1008327, elementId: 'animal-armor-trims-download-count' },
+            { id: 860325, elementId: 'more-beautiful-torches-download-count' },
+            { id: 868624, elementId: 'automessage-download-count' },
+            { id: 858922, elementId: 'danger-close-download-count' },
+            { id: 859307, elementId: 'eat-an-omelette-download-count' },
+            { id: 873866, elementId: 'golden-foods-download-count' },
+            { id: 888468, elementId: 'more-bows-and-arrows-download-count' },
+            { id: 884272, elementId: 'new-shield-variants-download-count' },
+            { id: 896385, elementId: 'new-slab-variants-download-count' },
+            { id: 886735, elementId: 'stackable-stew-and-soup-download-count' },
+            { id: 959446, elementId: 'enderpack-download-count' },
+            { id: 958881, elementId: 'time-on-display-download-count' }
+        ];
 
-        fetch(`https://api.cfwidget.com/1008327`)
-        .then(response => response.json())
-        .then(data => document.getElementById('animal-armor-trims-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/860325`)
-        .then(response => response.json())
-        .then(data => document.getElementById('more-beautiful-torches-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/868624`)
-        .then(response => response.json())
-        .then(data => document.getElementById('automessage-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/858922`)
-        .then(response => response.json())
-        .then(data => document.getElementById('danger-close-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/859307`)
-        .then(response => response.json())
-        .then(data => document.getElementById('eat-an-omelette-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/873866`)
-        .then(response => response.json())
-        .then(data => document.getElementById('golden-foods-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/888468`)
-        .then(response => response.json())
-        .then(data => document.getElementById('more-bows-and-arrows-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/884272`)
-        .then(response => response.json())
-        .then(data => document.getElementById('new-shield-variants-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/896385`)
-        .then(response => response.json())
-        .then(data => document.getElementById('new-slab-variants-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/886735`)
-        .then(response => response.json())
-        .then(data => document.getElementById('stackable-stew-and-soup-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/959446`)
-        .then(response => response.json())
-        .then(data => document.getElementById('enderpack-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
-
-        fetch(`https://api.cfwidget.com/958881`)
-        .then(response => response.json())
-        .then(data => document.getElementById('time-on-display-download-count').textContent = `${format(data.downloads.total)}`)
-        .catch(error => console.error('Error:', error));
+        Promise.allSettled(
+            mods.map(({ id, elementId }) =>
+                fetch(`https://api.cfwidget.com/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const el = document.getElementById(elementId);
+                        if (el && data && data.downloads && data.downloads.total != null) {
+                            el.textContent = format(data.downloads.total);
+                        }
+                    })
+                    .catch(error => console.error(`Error loading ${id}:`, error))
+            )
+        );
     </script>
 </body>
 </html>
