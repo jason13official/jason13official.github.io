@@ -39,12 +39,23 @@
 
             <div class="subsection">
 
-                <a href="https://www.curseforge.com/minecraft/mc-mods/dis-enchanting-table"><div class="subcontainer">
-                    <img src="img/mods/disenchanting_table.png" alt="Dis-Enchanting Table">
-                    <h4>Dis-Enchanting Table</h4>
-                    <p>Separate enchantments from your items!</p>
-                    <p class="download-count">Downloads: <span id="dis-enchanting-table-download-count"></span></p>
-                </div></a>
+                <div class="subcontainer">
+                    <a href="https://www.curseforge.com/minecraft/mc-mods/dis-enchanting-table" target="_blank" class="card-content-link">
+                        <img src="img/mods/disenchanting_table.png" alt="Dis-Enchanting Table">
+                        <h4>Dis-Enchanting Table</h4>
+                        <p>Separate enchantments from your items!</p>
+                    </a>
+                    <div class="card-downloads">
+                        <a href="https://www.curseforge.com/minecraft/mc-mods/dis-enchanting-table" target="_blank" class="download-btn cf-btn" title="CurseForge Downloads">
+                            <img src="img/platform/curse_forge.png" alt="CurseForge" class="platform-icon">
+                            <span id="dis-enchanting-table-download-count"></span>
+                        </a>
+                        <a href="https://modrinth.com/mod/dis-enchanting-table" target="_blank" class="download-btn mr-btn" title="Modrinth Downloads">
+                            <img src="img/platform/modrinth.png" alt="Modrinth" class="platform-icon">
+                            <span id="dis-enchanting-table-mr-download-count"></span>
+                        </a>
+                    </div>
+                </div>
 
                 <a href="https://www.curseforge.com/minecraft/mc-mods/animal-armor-trims"><div class="subcontainer">
                     <img src="img/mods/animal_armor_trims.png" alt="Animal Armor Trims">
@@ -189,6 +200,28 @@
                     .catch(error => console.error(`Error loading ${id}:`, error))
             )
         );
+
+        const modrinthMods = [
+            { id: '9BgYgXE4', elementId: 'dis-enchanting-table-mr-download-count' }
+        ];
+
+        if (modrinthMods.length > 0) {
+            const idsParam = encodeURIComponent(JSON.stringify(modrinthMods.map(m => m.id)));
+            fetch(`https://api.modrinth.com/v2/projects?ids=${idsParam}`)
+                .then(res => res.json())
+                .then(projects => {
+                    projects.forEach(project => {
+                        const match = modrinthMods.find(m => m.id === project.id || m.id === project.slug);
+                        if (match) {
+                            const el = document.getElementById(match.elementId);
+                            if (el && project.downloads != null) {
+                                el.textContent = format(project.downloads);
+                            }
+                        }
+                    });
+                })
+                .catch(err => console.error('Error loading Modrinth projects:', err));
+        }
     </script>
 </body>
 </html>

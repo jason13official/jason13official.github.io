@@ -159,6 +159,69 @@ nav ul li a:hover {
     color: white;;
 }
 
+.card-content-link {
+    text-decoration: none;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.card-downloads {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.4em 0.6em;
+    border-radius: 6px;
+    color: white !important;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: bold;
+    flex: 1;
+    min-width: 0;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-1px);
+}
+
+.download-btn.cf-btn {
+    background-color: #f16436;
+}
+
+.download-btn.cf-btn:hover {
+    background-color: #d55328;
+}
+
+.download-btn.mr-btn {
+    background-color: #00af5c;
+}
+
+.download-btn.mr-btn:hover {
+    background-color: #008f4c;
+}
+
+.download-btn .platform-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
     
     .menu-icon {
