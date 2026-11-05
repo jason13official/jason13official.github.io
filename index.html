@@ -55,6 +55,7 @@
         document.getElementById('days').textContent = `${days}`;
 
         function format(num) {
+            if (!num && num !== 0) return '...';
             if (num >= 1000000) {
                 return (num / 1000000).toFixed(1) + 'M';
             } else if (num >= 1000) {
@@ -63,7 +64,8 @@
             return num.toString();
         }
 
-        const mods = [
+        // Baseline mods (32 mods as instant fallback before/between syncs)
+        const defaultMods = [
     {
         title: "Dis-Enchanting Table",
         desc: "Separate enchantments from your items!",
@@ -356,86 +358,158 @@
 
         const grid = document.getElementById('mods-grid');
 
-        // Create card DOM element
+        // Create card element
         function createCard(mod) {
             const card = document.createElement('div');
             card.className = 'subcontainer';
+            
+            const localIcon = mod.icon || `img/mods/${mod.mrSlug.replace(/-/g, '_')}.png`;
+            const fallback = mod.fallbackIcon || '';
+
             card.innerHTML = `
                 <a href="https://www.curseforge.com/minecraft/mc-mods/${mod.cfSlug}" target="_blank" class="card-content-link">
-                    <img src="${mod.icon}" alt="${mod.title}">
+                    <img src="${localIcon}" alt="${mod.title}" onerror="if('${fallback}' && this.src !== '${fallback}') { this.src='${fallback}'; }">
                     <h4>${mod.title}</h4>
-                    <p>${mod.desc}</p>
+                    <p>${mod.desc || ''}</p>
                 </a>
                 <div class="card-downloads">
                     <a href="https://www.curseforge.com/minecraft/mc-mods/${mod.cfSlug}" target="_blank" class="download-btn cf-btn" title="CurseForge Downloads">
                         <img src="img/platform/curse_forge.png" alt="CurseForge" class="platform-icon">
-                        <span class="cf-count">...</span>
+                        <span class="cf-count">${format(mod.cfDownloads)}</span>
                     </a>
                     <a href="https://modrinth.com/mod/${mod.mrSlug}" target="_blank" class="download-btn mr-btn" title="Modrinth Downloads">
                         <img src="img/platform/modrinth.png" alt="Modrinth" class="platform-icon">
-                        <span class="mr-count">...</span>
+                        <span class="mr-count">${format(mod.mrDownloads)}</span>
                     </a>
                 </div>
             `;
-            mod.element = card;
-            mod.cfCountEl = card.querySelector('.cf-count');
-            mod.mrCountEl = card.querySelector('.mr-count');
             return card;
         }
 
-        // Initial render in default order
-        mods.forEach(mod => {
-            grid.appendChild(createCard(mod));
-        });
-
-        // Sort cards by CF downloads in descending order
-        function sortCardsByDownloads() {
-            mods.sort((a, b) => (b.cfDownloads || 0) - (a.cfDownloads || 0));
-            mods.forEach(mod => {
-                if (mod.element) {
-                    grid.appendChild(mod.element);
-                }
+        function renderCards(modList) {
+            grid.innerHTML = '';
+            modList.forEach(mod => {
+                grid.appendChild(createCard(mod));
             });
         }
 
-        // 1. Fetch CurseForge downloads concurrently & sort
-        Promise.allSettled(
-            mods.map(mod =>
-                fetch(`https://api.cfwidget.com/${mod.cfId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data && data.downloads && data.downloads.total != null) {
-                            mod.cfDownloads = data.downloads.total;
-                            if (mod.cfCountEl) {
-                                mod.cfCountEl.textContent = format(mod.cfDownloads);
-                            }
-                        }
-                    })
-                    .catch(err => console.error(`Error loading CF ${mod.cfId}:`, err))
-            )
-        ).then(() => {
-            sortCardsByDownloads();
-        });
-
-        // 2. Fetch Modrinth downloads in a single batch request
-        const mrIds = mods.map(m => m.mrId).filter(Boolean);
-        if (mrIds.length > 0) {
-            const idsParam = encodeURIComponent(JSON.stringify(mrIds));
-            fetch(`https://api.modrinth.com/v2/projects?ids=${idsParam}`)
-                .then(res => res.json())
-                .then(projects => {
-                    projects.forEach(project => {
-                        const mod = mods.find(m => m.mrId === project.id || m.mrSlug === project.slug);
-                        if (mod && project.downloads != null) {
-                            mod.mrDownloads = project.downloads;
-                            if (mod.mrCountEl) {
-                                mod.mrCountEl.textContent = format(mod.mrDownloads);
-                            }
-                        }
-                    });
-                })
-                .catch(err => console.error('Error loading Modrinth projects:', err));
+        function norm(s) {
+            if (!s) return '';
+            return s.split('|')[0].split('- major')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
         }
+
+        // Automatic discovery from CurseForge & Modrinth APIs
+        async function discoverAndSyncMods() {
+            try {
+                // 1. Fetch Modrinth user projects
+                const mrRes = await fetch('https://api.modrinth.com/v2/user/jason13official/projects');
+                if (!mrRes.ok) throw new Error('Modrinth user projects fetch failed');
+                const mrProjects = await mrRes.json();
+
+                const mrMap = new Map();
+                mrProjects.forEach(p => {
+                    mrMap.set(norm(p.title), p);
+                    mrMap.set(norm(p.slug), p);
+                });
+
+                // 2. Fetch CurseForge projects for jason13official
+                const cfRes = await fetch('https://api.cfwidget.com/author/search/jason13official');
+                if (!cfRes.ok) throw new Error('CurseForge author fetch failed');
+                const cfAuthor = await cfRes.json();
+                const cfProjects = cfAuthor.projects || [];
+
+                // 3. Concurrently fetch details for each CF project
+                const cfDetailsResults = await Promise.allSettled(
+                    cfProjects.map(p =>
+                        fetch(`https://api.cfwidget.com/${p.id}`)
+                            .then(r => r.ok ? r.json() : null)
+                            .catch(() => null)
+                    )
+                );
+
+                const discovered = [];
+
+                cfDetailsResults.forEach(res => {
+                    const data = res.value;
+                    if (!data) return;
+
+                    // Filter author requirement: "By jason13official" or "By Lupin"
+                    const firstMember = data.members && data.members[0] ? data.members[0].username.toLowerCase() : '';
+                    if (firstMember !== 'jason13official' && firstMember !== 'lupin') {
+                        return; // Ignore satisfy / third-party projects
+                    }
+
+                    // Match with Modrinth project
+                    const cfNorm = norm(data.title);
+                    let mrMatch = mrMap.get(cfNorm);
+                    if (!mrMatch) {
+                        for (const [key, val] of mrMap.entries()) {
+                            if ((cfNorm.length > 3 && key.includes(cfNorm)) || (key.length > 3 && cfNorm.includes(key))) {
+                                mrMatch = val;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!mrMatch) return; // Must exist on both platforms
+
+                    const cfSlug = data.urls && data.urls.curseforge
+                        ? data.urls.curseforge.replace(/\/$/, '').split('/').pop()
+                        : mrMatch.slug;
+
+                    const cleanTitle = data.title.split('|')[0].replace(/- MAJOR UPDATE.*/i, '').trim();
+
+                    // Short summary from CurseForge or Modrinth
+                    let desc = data.summary || mrMatch.description || '';
+                    desc = desc.replace(/[§]/g, '').trim();
+
+                    const localIcon = `img/mods/${mrMatch.slug.replace(/-/g, '_')}.png`;
+
+                    discovered.push({
+                        title: cleanTitle,
+                        desc: desc,
+                        icon: localIcon,
+                        fallbackIcon: mrMatch.icon_url || data.thumbnail || '',
+                        cfId: data.id,
+                        cfSlug: cfSlug,
+                        cfDownloads: data.downloads ? data.downloads.total : 0,
+                        mrId: mrMatch.id,
+                        mrSlug: mrMatch.slug,
+                        mrDownloads: mrMatch.downloads || 0
+                    });
+                });
+
+                if (discovered.length > 0) {
+                    // Sort descending by CurseForge download count
+                    discovered.sort((a, b) => (b.cfDownloads || 0) - (a.cfDownloads || 0));
+
+                    // Cache discovered list in localStorage for instant reload
+                    try {
+                        localStorage.setItem('cached_mods', JSON.stringify(discovered));
+                    } catch (e) {}
+
+                    renderCards(discovered);
+                }
+            } catch (err) {
+                console.error('Auto-discovery sync error:', err);
+            }
+        }
+
+        // Initial render: load cached mods or baseline defaultMods
+        let initialMods = [];
+        try {
+            const cached = localStorage.getItem('cached_mods');
+            if (cached) initialMods = JSON.parse(cached);
+        } catch (e) {}
+
+        if (!initialMods || initialMods.length === 0) {
+            initialMods = defaultMods;
+        }
+
+        renderCards(initialMods);
+
+        // Run automatic discovery & live sync
+        discoverAndSyncMods();
     </script>
 </body>
 </html>
